@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#171717"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="100dp"
+            android:background="#171717"
+            >
+            <ImageView
+                android:id="@+id/featherİmage"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="right|top"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="25dp"
+                android:src="@drawable/feather_copy"
+                />
+            <TextView
+                android:id="@+id/textViewScreen"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:fontFamily="serif"
+                android:text="Tüm Notlar"
+                android:textColor="#FFFFFF"
+                android:textSize="30dp"
+                android:textStyle="bold"
+                />
+
+        </FrameLayout>
+
+        <ListView
+            android:id="@+id/listViewNote"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+    </LinearLayout>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/flAddButton"
+        android:onClick="clicked"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#3ADC92"
+        app:backgroundTint="#3ADC92"
+        android:src="@drawable/ic_baseline_add_24"
+        android:layout_gravity="end|bottom"
+        android:translationY="-29dp"
+        android:layout_margin="16dp"
+        app:fabSize="normal"
+        />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
