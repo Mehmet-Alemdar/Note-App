@@ -3,6 +3,9 @@ package com.mehmetalemdar.basitnottut;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.dynamicanimation.animation.DynamicAnimation;
+import androidx.dynamicanimation.animation.SpringAnimation;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.animation.ObjectAnimator;
@@ -19,32 +22,61 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Toast;
+
+import com.mehmetalemdar.basitnottut.Adapter.RecyclerAdapter;
+import com.mehmetalemdar.basitnottut.Model.NoteModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RecyclerAdapter.RowHolder.Listener {
 
     SQLiteDatabase database;
 
-    ListView listViewNotes;
-    ArrayList<String> arrayListNoteTitle;
-    ArrayList<Integer> arrayListİd;
-    ArrayList<String> arrayListNote;
-    ArrayAdapter arrayAdapter;
+    RecyclerView mRecyclerView;
+    RecyclerAdapter recyclerAdapter;
+    ArrayList<NoteModel> noteModelArrayList;
 
     ImageView imageViewFeather;
+    SearchView mSearchView;
+    ImageView mSearchImage;
 
+    int searchImageClickNumber = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        imageViewFeather=findViewById(R.id.featherİmage);
+        imageViewFeather=findViewById(R.id.featherImage);
+        mRecyclerView = findViewById(R.id.mRecyclerView);
+        mSearchImage = findViewById(R.id.searchImage);
+        mSearchView = findViewById(R.id.searchView);
+
+        noteModelArrayList = new ArrayList<>();
+
+        mSearchImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchImageClickNumber ++ ;
+                if (searchImageClickNumber % 2 == 0){
+                    mSearchView.setVisibility(View.VISIBLE);
+                    mSearchImage.setImageResource(R.drawable.ic_close);
 
 
+
+                }else{
+                    mSearchView.setVisibility(View.INVISIBLE);
+                    mSearchImage.setImageResource(R.drawable.ic_search);
+                    mSearchView.setQuery("",false);
+                    mSearchView.clearFocus();
+                    searchImageClickNumber = 1 ;
+
+                }
+            }
+        });
 
         imageViewFeather.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,9 +89,7 @@ public class MainActivity extends AppCompatActivity {
                         ObjectAnimator animator=ObjectAnimator.ofFloat(imageViewFeather,"translationY",-15f);
                         animator.setDuration(500);
                         animator.start();
-
                     }
-
                     @Override
                     public void onFinish() {
                         imageViewFeather.setVisibility(View.VISIBLE);
@@ -71,74 +101,26 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        listViewNotes=findViewById(R.id.listViewNote);
-        arrayListNoteTitle=new ArrayList<>();
-        arrayListNote=new ArrayList<>();
-        arrayListİd=new ArrayList<>();
-
-        //veritabanındaki veriler listview itemlarında görüntülenmesini sağlıyor
-        arrayAdapter=new ArrayAdapter(this,R.layout.row,arrayListNoteTitle);
-        listViewNotes.setAdapter(arrayAdapter);
-
-
-        //tıklanan itemın index numarasına göre veritabnındaki o id numaralı bilgileri ikinci aktiviteye aktarıyor
-        listViewNotes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                Intent intent=new Intent(MainActivity.this,MainActivity2.class);
-                intent.putExtra("noteId",arrayListİd.get(position));
-                intent.putExtra("info","old");
-                startActivity(intent);
-
-
-            }
-        });
-
-        listViewNotes.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                final int which_position=position;
-                String noteDeleteName=arrayAdapter.getItem(position).toString();
-                AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this, R.style.Theme_AppCompat_Dialog_Alert)
-                        .setIcon(R.drawable.ic_baseline_delete_24)
-                        .setTitle("Sil")
-                        .setMessage("-"+noteDeleteName.toUpperCase()+"-\nSilmek İstediğine Emin Misin?")
-                        .setPositiveButton("Sil", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                which=which_position;
-                                deletedData(which);
-                                arrayListNoteTitle.remove(which);
-                                arrayListNote.remove(which);
-                                arrayListİd.remove(which);
-                                arrayAdapter.notifyDataSetChanged();
-                            }
-                        })
-                        .setNegativeButton("Vazgeç", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        });
-                Dialog dialog = alert.create();
-                dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_design);
-                dialog.show();
-
-                return true;
-            }
-        });
         getData();
+
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                recyclerAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerAdapter = new RecyclerAdapter(noteModelArrayList,this);
+        mRecyclerView.setAdapter(recyclerAdapter);
+
     }
-
-    /*public void imageViewFeatherAnimation(){
-        ObjectAnimator animator=ObjectAnimator.ofFloat(imageViewFeather,"translationX",150f);
-        animator.setDuration(1000);
-        animator.start();
-    }
-
-     */
-
 
     //veri tabanındaki veriler türlerine göre listelere aktarılıyor
     public void getData(){
@@ -150,24 +132,27 @@ public class MainActivity extends AppCompatActivity {
             int titleIndex=cursor.getColumnIndex("notetitlesql");
             int noteIndex=cursor.getColumnIndex("note");
 
-
-
+            NoteModel mNoteModel;
+            String noteStr;
+            String titleStr;
             while (cursor.moveToNext()){
+                mNoteModel = new NoteModel();
 
-                String noteTextLength=cursor.getString(titleIndex);
-                if(noteTextLength.length()>30){
-                    arrayListNoteTitle.add(noteTextLength.substring(0,30)+"...");
-                }
-                else{
-                    arrayListNoteTitle.add(noteTextLength);
-                }
-                arrayListİd.add(cursor.getInt(idIndex));
-                arrayListNote.add(cursor.getString(noteIndex));
+                mNoteModel.id = cursor.getInt(idIndex);
+                titleStr = cursor.getString(titleIndex);
+                noteStr = cursor.getString(noteIndex);
+
+                titleStr = titleStr.trim();
+                mNoteModel.title = titleStr;
+                noteStr = noteStr.trim();
+                mNoteModel.note = noteStr;
+
+                noteModelArrayList.add(mNoteModel);
+
 
             }
-            Collections.reverse(arrayListNoteTitle); //en son eklenen notu yukarıya ekliyor
-            Collections.reverse(arrayListİd); //en son eklenen not yukarıya geldiğinden idler ile list indexleri ters düşmesin diye idleri ters çevirip eşitliyorum
-            arrayAdapter.notifyDataSetChanged();
+            Collections.reverse(noteModelArrayList);
+            recyclerAdapter.notifyDataSetChanged();
             cursor.close();
         }catch (Exception e){
             e.printStackTrace();
@@ -179,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
     public  int deletedData(Integer idPosition){
         try {
             database=getApplicationContext().openOrCreateDatabase("Notes",MODE_PRIVATE,null);
-            database.execSQL("DELETE FROM notes WHERE id=?",new String[] {String.valueOf(arrayListİd.get(idPosition))});
+            database.execSQL("DELETE FROM notes WHERE id=?",new String[] {String.valueOf(noteModelArrayList.get(idPosition).id)});
 
         }
         catch (Exception e){
@@ -198,4 +183,45 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @Override
+    public void onItemClickListener(int position) {
+
+        Intent intent=new Intent(MainActivity.this,MainActivity2.class);
+        intent.putExtra("noteId",noteModelArrayList.get(position).id);
+        intent.putExtra("info","old");
+        startActivity(intent);
+    }
+
+    @Override
+    public void onLongItemClickListener(int position) {
+
+        final int which_position=position;
+        String noteDeleteName=String.valueOf(noteModelArrayList.get(position).title);
+        String noteContent = String.valueOf(noteModelArrayList.get(position).note);
+        noteContent = noteContent.trim();
+        AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this, R.style.Theme_AppCompat_Dialog_Alert)
+                .setIcon(R.drawable.ic_baseline_delete_24)
+                .setTitle("Practical Reading or Delete")
+                .setMessage("-"+noteDeleteName.toUpperCase()+"-\n" + "\n"+noteContent + "\n"+"\nSilmek İster Misin ?")
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        which=which_position;
+                        deletedData(which);
+
+                        noteModelArrayList.remove(which);
+
+                        recyclerAdapter.notifyDataSetChanged();
+                    }
+                })
+                .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+        Dialog dialog = alert.create();
+        dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_design);
+        dialog.show();
+    }
 }

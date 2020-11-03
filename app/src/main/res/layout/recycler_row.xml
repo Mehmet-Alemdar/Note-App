@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="130dp"
+    android:background="@drawable/recycler_backgroud"
+    android:paddingBottom="10dp"
+    >
+
+    <FrameLayout
+        android:layout_width="13dp"
+        android:layout_height="13dp"
+        android:background="@drawable/framelayout_recycler_design"
+        android:layout_gravity="top|left"
+        android:layout_marginTop="28dp"
+        android:layout_marginLeft="15dp"
+        />
+    <TextView
+        android:id="@+id/txtRecyclerTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Titlegbxcvvbcvbxcvbxcvbxcvbxcvbxcvbcxbxcbxcvbxcbcxbvxcb"
+        android:maxLength="20"
+        android:textSize="22sp"
+        android:fontFamily="serif"
+        android:textColor="#171717"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="35dp"
+        android:layout_marginTop="18dp"
+        android:textStyle="bold"
+        />
+    <TextView
+        android:id="@+id/txtRecyclerNote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_gravity="top|left"
+        android:layout_marginRight="30dp"
+        android:layout_marginLeft="50dp"
+
+        android:layout_marginTop="60dp"
+        android:text="note content sfglfsdlgdsf kldsfg fsdgjsdfg dfsdfgsdfgdgsfdfgsdfsgdsfgdsfgdsfgdsfgsgklsdfgjkljsdflgjsfgkldfgsjkkjsdfglksdfsdfgkjklsfgjksdfg"
+        android:textSize="15sp"
+        android:fontFamily="serif"
+        android:textColor="#FF8C4B"
+
+        android:maxLength="45"
+
+        />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

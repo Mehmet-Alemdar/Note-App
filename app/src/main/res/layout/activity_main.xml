@@ -8,7 +8,6 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -16,23 +15,24 @@
 
         <FrameLayout
             android:layout_width="fill_parent"
-            android:layout_height="100dp"
+            android:layout_height="wrap_content"
             android:background="#171717"
             >
             <ImageView
-                android:id="@+id/featherİmage"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:id="@+id/featherImage"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="right|top"
                 android:layout_marginRight="15dp"
-                android:layout_marginTop="25dp"
-                android:src="@drawable/feather_copy"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/feat"
                 />
             <TextView
                 android:id="@+id/textViewScreen"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:layout_gravity="center"
+                android:layout_gravity="center|top"
+                android:layout_marginTop="10dp"
                 android:fontFamily="serif"
                 android:text="Tüm Notlar"
                 android:textColor="#FFFFFF"
@@ -40,12 +40,47 @@
                 android:textStyle="bold"
                 />
 
+            <ImageView
+                android:id="@+id/searchImage"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="right|top"
+                android:layout_marginTop="75dp"
+                android:layout_marginRight="20dp"
+                android:src="@drawable/ic_search" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="65dp"
+                >
+
+                <SearchView
+                    android:id="@+id/searchView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|center"
+                    android:background="@drawable/searchview_design"
+                    android:clickable="true"
+                    android:iconifiedByDefault="false"
+                    android:maxWidth="220dp"
+                    android:queryHint="..."
+                    android:searchIcon="@drawable/feat"
+                    android:visibility="invisible"
+
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </FrameLayout>
 
-        <ListView
-            android:id="@+id/listViewNote"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/mRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </LinearLayout>
 
 

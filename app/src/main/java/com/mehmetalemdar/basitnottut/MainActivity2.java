@@ -19,6 +19,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.mehmetalemdar.basitnottut.Model.NoteModel;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -36,15 +38,11 @@ public class MainActivity2 extends AppCompatActivity {
     public int noteId;
 
     String info;
-
-
-
     String noteTitleStr;
     String noteStr;
 
     //editText ten alınan verilen stringlere atandı
-    String noteTitle;
-    String note;
+
 
     // ses ile yazı yazmak için
     final int REQ_CODE_SPEECH=1;
@@ -99,7 +97,6 @@ public class MainActivity2 extends AppCompatActivity {
         Intent intent=new Intent(getApplicationContext(),MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
-
     }
 
     //ses ile yazı yazmak için
@@ -136,9 +133,7 @@ public class MainActivity2 extends AppCompatActivity {
                 }
                 break;
             }
-
         }
-
     }
 
     //sil butonuna tıklandığında
@@ -152,13 +147,13 @@ public class MainActivity2 extends AppCompatActivity {
                     .setIcon(R.drawable.ic_baseline_delete_24)
                     .setTitle("Sil")
                     .setMessage("Silmek İstediğine Emin Misin?")
-                    .setPositiveButton("Sil", new DialogInterface.OnClickListener() {
+                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             deleteData();
                         }
                     })
-                    .setNegativeButton("Vazgeç", new DialogInterface.OnClickListener() {
+                    .setNegativeButton("Close", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
@@ -202,12 +197,12 @@ public class MainActivity2 extends AppCompatActivity {
         if(info.matches("new")){
             toastText="Başlık Olmadan Kaydedilsin Mi?";
             toastNoteText="Not Olmadan Kaydedilsin Mi?";
-            toastPositiveButtonText="Kaydet";
+            toastPositiveButtonText="Save";
 
         }else{
             toastText="Başlık Olmadan Güncellensin Mi?";
             toastNoteText="Not Olmadan Güncellensin Mi?";
-            toastPositiveButtonText="Güncelle";
+            toastPositiveButtonText="Up Date";
         }
 
         if(editTextTitle.getText().toString().trim().equals("")&& editTextNote.getText().toString().trim().equals("")){
@@ -226,7 +221,7 @@ public class MainActivity2 extends AppCompatActivity {
                             saveOrUpdate();
                         }
                     })
-                    .setNegativeButton("Vazgeç", new DialogInterface.OnClickListener() {
+                    .setNegativeButton("Close", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
@@ -247,7 +242,7 @@ public class MainActivity2 extends AppCompatActivity {
                             saveOrUpdate();
                         }
                     })
-                    .setNegativeButton("Vazgeç", new DialogInterface.OnClickListener() {
+                    .setNegativeButton("Close", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
@@ -260,12 +255,13 @@ public class MainActivity2 extends AppCompatActivity {
         else{
             saveOrUpdate();
         }
-
     }
     //kaydetme ya da güncelleme metodu
     public void saveOrUpdate(){
-        noteTitle=editTextTitle.getText().toString();
-        note=editTextNote.getText().toString();
+        NoteModel noteModel = new NoteModel();
+        noteModel.title = editTextTitle.getText().toString().trim();
+        noteModel.note = editTextNote.getText().toString().trim();
+
         if(info.matches("new")){
 
             try {
@@ -274,8 +270,8 @@ public class MainActivity2 extends AppCompatActivity {
 
                 String sqlString="INSERT INTO notes(notetitlesql,note) VALUES(?,?)";
                 SQLiteStatement sqLiteStatement=database.compileStatement(sqlString);
-                sqLiteStatement.bindString(1,noteTitle);
-                sqLiteStatement.bindString(2,note);
+                sqLiteStatement.bindString(1,noteModel.title);
+                sqLiteStatement.bindString(2,noteModel.note);
                 sqLiteStatement.execute();
 
             }catch (Exception e){
@@ -293,15 +289,14 @@ public class MainActivity2 extends AppCompatActivity {
                 startActivity(intent);
             }
             else{
-                String noteIdUpdate=String.valueOf(noteId);
                 try {
 
                     database=this.openOrCreateDatabase("Notes",MODE_PRIVATE,null);
                     String sqlString="UPDATE notes SET notetitlesql=?,note=? WHERE id=?";
                     SQLiteStatement sqLiteStatement=database.compileStatement(sqlString);
-                    sqLiteStatement.bindString(1,noteTitle);
-                    sqLiteStatement.bindString(2,note);
-                    sqLiteStatement.bindString(3,noteIdUpdate);
+                    sqLiteStatement.bindString(1,noteModel.title);
+                    sqLiteStatement.bindString(2,noteModel.note);
+                    sqLiteStatement.bindString(3,String.valueOf(noteId));
                     sqLiteStatement.execute();
                 }
                 catch (Exception e){
@@ -312,7 +307,6 @@ public class MainActivity2 extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"GÜNCELLENDİ",Toast.LENGTH_SHORT).show();
                 startActivity(intent);
             }
-
         }
     }
 
